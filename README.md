@@ -33,31 +33,12 @@ pip install -r requirements.txt
 
 ## ⚙️ Setup
 
-### 1. Twitter Developer Portal
-
-1. アプリを作成
-2. User authentication settings を有効化  
-   - Type: OAuth1.0a  
-   - Permissions: Read and Write  
-3. API Key / API Secret と Access Token / Access Token Secret を発行
-
-### 2. .env
+### .env
 
 ```bash
 # 監視キーワード
 KEYWORD=検索したいワード
 INTERVAL_SEC=600 #何分置きに検索か
-
-# DAM API 固定値（必要なら変更可）
-MODEL_TYPE_CODE=1
-SERIAL_NO=BA000001
-COMP_ID=1
-AUTH_KEY=2/Qb9R@8s*
-CONTENTS_CODE=
-SERVICE_CODE=
-SORT=2
-DISP_COUNT=100
-PAGE_NO=1
 
 # X (OAuth1.0a) 4キー
 TW_CONSUMER_KEY=xxxxxxxxxxxxxxxx
@@ -100,7 +81,6 @@ python main.py
 
 ## ⚠️ 注意
 
-- Access Token/Secret を公開しないこと！  
 - X アプリ権限は必ず Read and Write に設定  
 - サーバーの時刻が大きくズレていると認証エラーになる場合あり  
 
@@ -108,4 +88,4 @@ python main.py
 
 ## 🖤 Author
 
-つくった人: ばんぶー
+ばんぶー
