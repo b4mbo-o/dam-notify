@@ -26,19 +26,23 @@ Club DAM の検索 API を叩いて **新曲が追加されたら X(Twitter) に
 インストール:
 
 ```bash
-pip install -r requirements.txt```
+pip install -r requirements.txt
+```
 
-⚙️ Setup
+---
 
-1. Twitter Developer Portal
+## ⚙️ Setup
 
-	1.	アプリを作成
-	2.	User authentication settings を有効化
-	•	Type: OAuth1.0a
-	•	Permissions: Read and Write
-	3.	API Key / API Secret と Access Token / Access Token Secret を発行
+### 1. Twitter Developer Portal
 
-2. .env
+1. アプリを作成
+2. User authentication settings を有効化  
+   - Type: OAuth1.0a  
+   - Permissions: Read and Write  
+3. API Key / API Secret と Access Token / Access Token Secret を発行
+
+### 2. .env
+
 ```bash
 # 監視キーワード
 KEYWORD=検索したいワード
@@ -61,36 +65,47 @@ TW_CONSUMER_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
 TW_ACCESS_TOKEN=xxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx
 TW_ACCESS_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
-▶️ Usage
+
+---
+
+## ▶️ Usage
 
 起動:
 
+```bash
 python main.py
+```
 
 動作:
-	•	初回起動: 現在の件数を保存して監視開始
-	•	件数が増加したら:
-	•	🎤 ツイート
-	•	state_api.json を削除
-	•	プロセス終了
+- 初回起動: 現在の件数を保存して監視開始  
+- 件数が増加したら:  
+  - 🎤 ツイート  
+  - state_api.json を削除  
+  - プロセス終了  
 
-📝 Example Tweet
+---
 
+## 📝 Example Tweet
+
+```
 🎤 Club DAMに『iLiFE!』の新曲が追加されました！
 22 → 25 件
 • 会いにKiTE!
 • #ラブコード
 • アイドルライフスターターパック
 #DAM #カラオケ #iLiFE
-
-⚠️ 注意
-
-	•	Access Token/Secret を公開しないこと！
-	•	X アプリ権限は必ず Read and Write に設定
-	•	サーバーの時刻が大きくズレていると認証エラーになる場合あり
-
-🖤 Author
-
-つくった人: ばんぶー
+```
 
 ---
+
+## ⚠️ 注意
+
+- Access Token/Secret を公開しないこと！  
+- X アプリ権限は必ず Read and Write に設定  
+- サーバーの時刻が大きくズレていると認証エラーになる場合あり  
+
+---
+
+## 🖤 Author
+
+つくった人: ばんぶー
