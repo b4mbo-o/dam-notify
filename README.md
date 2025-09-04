@@ -26,7 +26,7 @@ Club DAM の検索 API を叩いて **新曲が追加されたら X(Twitter) に
 インストール:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt```
 
 ⚙️ Setup
 
@@ -39,7 +39,7 @@ pip install -r requirements.txt
 	3.	API Key / API Secret と Access Token / Access Token Secret を発行
 
 2. .env
-
+```bash
 # 監視キーワード
 KEYWORD=検索したいワード
 INTERVAL_SEC=600 #何分置きに検索か
@@ -60,7 +60,7 @@ TW_CONSUMER_KEY=xxxxxxxxxxxxxxxx
 TW_CONSUMER_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
 TW_ACCESS_TOKEN=xxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx
 TW_ACCESS_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
+```
 ▶️ Usage
 
 起動:
