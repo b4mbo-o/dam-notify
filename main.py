@@ -104,10 +104,27 @@ def format_tweet(keyword: str, before: int, after: int, titles: list[str]) -> st
     lines.append(tags)
     return "\n".join(lines)
 
-# ===== メインループ =====
+def load_state():
+    if STATE_FILE.exists():
+        try:
+            return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+def save_state(total: int, titles: list[str]):
+    STATE_FILE.write_text(
+        json.dumps({"initial_total": total, "titles": titles}, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+
 def main_loop():
     print(f"== DAM watch via API (keyword={KEYWORD}) ==")
-    baseline = load_initial_total()
+    state = load_state()
+    baseline = state.get("initial_total")
+    old_titles = set(state.get("titles", []))
+    stable_count = 0  # 新曲検出後の安定カウンタ
+    detected = False  # 新曲検知フラグ
 
     while True:
         try:
@@ -116,23 +133,36 @@ def main_loop():
             titles = [it.get("title") for it in (js.get("list") or []) if it.get("title")]
 
             if baseline is None:
-                save_initial_total(total)
+                save_state(total, titles)
                 baseline = total
                 print(f"[init] baseline totalCount = {baseline}")
             else:
                 print(f"[poll] total={total} (baseline={baseline})")
+
                 if total > baseline:
-                    tweet(format_tweet(KEYWORD, baseline, total, titles))
-                    delete_state_file()  # ★使い終わったら毎回消す
-                    print("[done] 変化を検出 → 終了")
-                    sys.exit(0)
-                # 減少/同じはスルー
+                    new_titles = [t for t in titles if t not in old_titles]
+                    if new_titles:
+                        print(f"[detect] 新曲 {len(new_titles)} 件追加: {new_titles}")
+                        tweet(format_tweet(KEYWORD, baseline, total, new_titles))
+                        baseline = total
+                        old_titles = set(titles)
+                        detected = True
+                        stable_count = 0  # リセット
+                else:
+                    if detected:
+                        stable_count += 1
+                        print(f"[stable] 変化なし ({stable_count}/10)")
+                        if stable_count >= 10:
+                            print("[done] 10回連続で変化なし → 終了")
+                            delete_state_file()
+                            sys.exit(0)
+
         except tweepy.TweepyException as e:
             print("[error] tweet失敗:", e)
-            print("ヒント: アプリ権限がRead & Writeか / 4キーが同一アプリ由来か / 時刻ズレがないか")
         except Exception as e:
             print("[error]", e)
 
+        print(f"[debug] waiting {INTERVAL_SEC} sec before next check")
         time.sleep(INTERVAL_SEC)
 
 if __name__ == "__main__":
