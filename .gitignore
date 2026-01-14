@@ -1,0 +1,6 @@
+.env
+.env.save
+html_getter.py
+state_api.json
+state/
+keywords.txt

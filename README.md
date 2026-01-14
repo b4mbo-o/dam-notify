@@ -12,7 +12,8 @@ Club DAM の検索 API を叩いて **新曲が追加されたら X(Twitter) に
 - ✅ 新曲タイトルを3件までプレビュー  
 - ✅ OAuth1.0a (4キー方式) で自分の X アカウントに自動投稿  
 - ✅ ツイートに **#DAM #カラオケ #KEYWORD** のハッシュタグを付与  
-- ✅ ツイート後に `state_api.json` を削除 → 次回は再度初期化から監視  
+- ✅ キーワードを複数監視 & 検知したキーワードは自動でリストから削除  
+- ✅ ツイート後はキーワードごとの状態ファイルを削除 → 次回は再度初期化から監視  
 
 ---
 
@@ -36,9 +37,15 @@ pip install -r requirements.txt
 ### .env
 
 ```bash
-# 監視キーワード
-KEYWORD=検索したいワード
-INTERVAL_SEC=600 #何分置きに検索か
+# 監視キーワード: いずれかで指定
+KEYWORDS=word1,word2  # カンマ or 改行区切り
+# または KEYWORDS_FILE=keywords.txt  # 1行1キーワードで書く（デフォルト値）
+# または KEYWORD=単一キーワード     # 後方互換
+
+INTERVAL_SEC=600 # 何秒おきに検索か
+
+# キーワードを検出したら keywords.txt から自動削除するか
+# REMOVE_KEYWORD_ON_HIT=true
 
 # X (OAuth1.0a) 4キー
 TW_CONSUMER_KEY=xxxxxxxxxxxxxxxx
@@ -61,8 +68,15 @@ python main.py
 - 初回起動: 現在の件数を保存して監視開始  
 - 件数が増加したら:  
   - 🎤 ツイート  
-  - state_api.json を削除  
-  - プロセス終了  
+  - そのキーワードの状態ファイル (`state/<keyword>.json`) を削除  
+  - `REMOVE_KEYWORD_ON_HIT=true` なら `keywords.txt` から該当キーワードを削除  
+  - ループを続行（他キーワードの監視継続）  
+
+### keywords.txt (デフォルトのキーワード管理)
+
+リポジトリ直下の `keywords.txt` に 1行1キーワードで書くと、複数ワードを監視できます。  
+`#` 始まりの行はコメント扱い。  
+検知後に自動削除させたい場合は `.env` で `REMOVE_KEYWORD_ON_HIT=true` のままにしておきます（デフォルト）。
 
 ---
 
@@ -76,6 +90,45 @@ python main.py
 • アイドルライフスターターパック
 #DAM #カラオケ #iLiFE
 ```
+
+---
+
+## 🛠️ systemd 常駐の例
+
+リポジトリ内の `dam-notify.service` を `/etc/systemd/system/` に配置するか、以下をベースに作成します（パスは環境に合わせて調整してください）。
+
+```
+[Unit]
+Description=DAM Notify Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/dam-notify
+EnvironmentFile=/root/dam-notify/.env
+ExecStart=/usr/bin/python3 /root/dam-notify/main.py
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+```
+
+反映と自動起動:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now dam-notify.service
+```
+
+ログ確認:
+
+```bash
+journalctl -u dam-notify.service -f
+```
+
+キーワードや .env を変えたら `sudo systemctl restart dam-notify.service` を実行してください。
 
 ---
 
